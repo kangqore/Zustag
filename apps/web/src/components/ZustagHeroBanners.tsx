@@ -376,17 +376,17 @@ export const ZustagHeroBanners: React.FC<ZustagHeroBannersProps> = ({
 
   return (
     <div className="w-full bg-transparent space-y-6 sm:space-y-8 pt-3 pb-3">
-      {/* 1. Interactive 3D Luxury Coupon Card with 1-Click Copy */}
+      {/* 1. Interactive 3D Luxury Coupon Card with 1-Click Copy (Compact 50% Height) */}
       <div className="max-w-[1500px] mx-auto px-4 sm:px-8">
-        <div className="relative bg-gradient-to-r from-[#fff6ed] via-[#fff9f5] to-[#fef0e4] border-2 border-dashed border-[#fbc9a4] rounded-3xl p-5 sm:p-7 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_4px_24px_rgba(242,106,16,0.08)] overflow-hidden group">
+        <div className="relative bg-gradient-to-r from-[#fff6ed] via-[#fff9f5] to-[#fef0e4] border-2 border-dashed border-[#fbc9a4] rounded-2xl py-2 px-4 sm:py-2.5 sm:px-7 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 shadow-[0_2px_14px_rgba(242,106,16,0.06)] overflow-hidden group">
           <div className="absolute inset-0 animate-shimmer pointer-events-none opacity-40" />
 
           {/* Left Headline */}
-          <div className="space-y-1 text-center md:text-left z-10">
-            <div className="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-[#ff3f6c] via-[#f26a10] to-[#ff905a] bg-clip-text text-transparent font-display">
+          <div className="text-center md:text-left z-10 flex md:flex-col items-center md:items-start gap-1.5 md:gap-0">
+            <div className="text-lg sm:text-2xl font-black tracking-tight bg-gradient-to-r from-[#ff3f6c] via-[#f26a10] to-[#ff905a] bg-clip-text text-transparent font-display leading-tight">
               Get 25% Off
             </div>
-            <div className="text-xl sm:text-2xl font-black text-[#1e2434] tracking-tight">
+            <div className="text-xs sm:text-sm font-black text-[#1e2434] tracking-tight leading-tight">
               Up To ₹200 Off*
             </div>
           </div>
@@ -394,36 +394,36 @@ export const ZustagHeroBanners: React.FC<ZustagHeroBannersProps> = ({
           {/* Center Interactive Coupon Pill */}
           <div 
             onClick={handleCopyCoupon}
-            className="flex flex-col items-center justify-center bg-white px-8 py-3.5 rounded-full border-2 border-[#1e2434] shadow-[0_8px_20px_rgba(0,0,0,0.06)] hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer z-10 select-none group/coupon"
+            className="flex flex-col items-center justify-center bg-white px-5 py-1.5 sm:px-6 sm:py-1.5 rounded-full border-2 border-[#1e2434] shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-md hover:scale-102 transition-all duration-200 cursor-pointer z-10 select-none group/coupon"
           >
-            <div className="text-[10px] uppercase tracking-widest text-[#7e818c] font-black flex items-center gap-1">
+            <div className="text-[9px] uppercase tracking-widest text-[#7e818c] font-black flex items-center gap-1 leading-none">
               <span>COUPON CODE</span>
-              <span className="text-[9px] text-[#ff3f6c] font-extrabold">(TAP TO COPY)</span>
+              <span className="text-[8px] text-[#ff3f6c] font-extrabold">(TAP TO COPY)</span>
             </div>
-            <div className="flex items-center gap-2.5 mt-0.5">
-              <span className="text-xl sm:text-2xl font-black text-[#1e2434] tracking-wider font-mono">
+            <div className="flex items-center gap-2 mt-0.5 leading-none">
+              <span className="text-base sm:text-lg font-black text-[#1e2434] tracking-wider font-mono">
                 ZUSTAGJSR
               </span>
               {copiedCoupon ? (
-                <span className="bg-[#03a685] text-white p-1 rounded-full text-xs animate-bounce">
-                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                <span className="bg-[#03a685] text-white p-0.5 rounded-full text-[10px] animate-bounce">
+                  <Check className="w-3 h-3 stroke-[3]" />
                 </span>
               ) : (
                 <span className="text-[#7e818c] group-hover/coupon:text-[#ff3f6c] transition-colors">
-                  <Copy className="w-4 h-4" />
+                  <Copy className="w-3.5 h-3.5" />
                 </span>
               )}
             </div>
           </div>
 
           {/* Right % Badge */}
-          <div className="flex items-center gap-4 z-10 text-center md:text-right">
-            <div className="text-5xl sm:text-6xl font-black text-[#ff905a]/80 select-none animate-pulse font-display">
+          <div className="flex items-center gap-2.5 z-10 text-center md:text-right">
+            <div className="text-3xl sm:text-4xl font-black text-[#ff905a]/80 select-none animate-pulse font-display leading-none">
               %
             </div>
-            <div className="text-xs text-[#535766] font-semibold leading-tight">
+            <div className="text-[11px] text-[#535766] font-semibold leading-tight text-left">
               <div className="font-bold text-[#1e2434]">On Your First Showroom Order</div>
-              <div className="text-[10px] text-[#7e818c] mt-0.5">T&C Apply &bull; ⚡ 30-Min Jamshedpur Dispatch</div>
+              <div className="text-[9px] text-[#7e818c]">T&C Apply &bull; ⚡ 30-Min Jamshedpur Dispatch</div>
             </div>
           </div>
         </div>
