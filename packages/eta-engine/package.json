@@ -1,0 +1,13 @@
+{
+  "name": "@zustag/eta-engine",
+  "version": "0.1.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@zustag/domain-core": "*"
+  }
+}
