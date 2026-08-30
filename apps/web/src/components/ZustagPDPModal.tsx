@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   X, 
   Star, 
@@ -20,7 +20,10 @@ import {
   Ruler,
   Info,
   ChevronRight,
-  Bot
+  Bot,
+  Layers,
+  Search,
+  Plus
 } from 'lucide-react';
 import { LocalAvailabilityItem, ProductVariant } from '@zustag/domain-core';
 import { ZustagSmartFitModal } from './ZustagSmartFitModal';
@@ -55,9 +58,22 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
   const [showSizeChart, setShowSizeChart] = useState<boolean>(false);
   const [showSmartFitAI, setShowSmartFitAI] = useState<boolean>(false);
 
+  // Fabric Zoom Loupe State (Track 2)
+  const [isZooming, setIsZooming] = useState<boolean>(false);
+  const [zoomPos, setZoomPos] = useState<{ x: number; y: number }>({ x: 50, y: 50 });
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
   const price = selectedVariant.price;
   const mrp = selectedVariant.mrp;
   const discountPercent = Math.round(((mrp - price) / mrp) * 100);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imageContainerRef.current) return;
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    setZoomPos({ x, y });
+  };
 
   const handleAdd = () => {
     onAddToCart(item, selectedVariant);
@@ -66,6 +82,7 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
   };
 
   const availableSizes = product.variants.map(v => v.size);
+  const activeImage = product.images[activeImageIdx] || product.images[0] || FALLBACK_PDP_IMAGE;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
@@ -78,18 +95,43 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Left: Product Image Gallery + Showroom Provenance */}
+        {/* Left: Product Image Gallery with Fabric Zoom Loupe + Showroom Provenance */}
         <div className="w-full md:w-1/2 p-5 sm:p-7 bg-[#fbfbfa] border-r border-[#eaeaec] flex flex-col justify-between overflow-y-auto">
-          <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-[#f5f5f7] shadow-sm">
-            <img
-              src={product.images[activeImageIdx] || product.images[0] || FALLBACK_PDP_IMAGE}
-              alt={product.title}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = FALLBACK_PDP_IMAGE;
-              }}
-              className="w-full h-full object-cover"
-            />
+          
+          {/* Main Photo Box with Interactive Zoom Loupe (Track 2) */}
+          <div 
+            ref={imageContainerRef}
+            onMouseEnter={() => setIsZooming(true)}
+            onMouseLeave={() => setIsZooming(false)}
+            onMouseMove={handleMouseMove}
+            className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-[#f5f5f7] shadow-sm cursor-crosshair group select-none"
+          >
+            {isZooming ? (
+              <div 
+                className="w-full h-full bg-no-repeat transition-all duration-75"
+                style={{
+                  backgroundImage: `url(${activeImage})`,
+                  backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+                  backgroundSize: '250%'
+                }}
+              />
+            ) : (
+              <img
+                src={activeImage}
+                alt={product.title}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = FALLBACK_PDP_IMAGE;
+                }}
+                className="w-full h-full object-cover"
+              />
+            )}
+
+            {/* Hover Loupe Hint Tag */}
+            <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-white text-[9px] font-black px-2 py-1 rounded-full border border-white/20 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+              <Search className="w-3 h-3 text-cyan-300" />
+              <span>{isZooming ? '2.5X ULTRA-HD ZOOM' : 'HOVER TO ZOOM FABRIC'}</span>
+            </div>
 
             {/* Showroom Origin Pill */}
             <div className="absolute bottom-3 left-3 bg-[#182344]/95 text-white px-3 py-1.5 rounded-xl text-xs font-semibold backdrop-blur-md flex items-center gap-2 border border-white/10 shadow-md">
@@ -97,13 +139,14 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
               <span>Direct from <strong>{store.name.split('-')[0]}</strong></span>
             </div>
 
-            {/* CCTV Security Verified Badge */}
+            {/* CCTV Security Verified Badge (Track 2) */}
             <div className="absolute top-3 left-3 bg-white/95 text-[#1e2434] px-2.5 py-1 rounded-lg text-[10px] font-black backdrop-blur-md flex items-center gap-1.5 shadow-sm border border-[#eaeaec]">
-              <Video className="w-3.5 h-3.5 text-[#03a685]" />
-              <span>PACKED UNDER CCTV</span>
+              <Video className="w-3.5 h-3.5 text-[#03a685] animate-pulse" />
+              <span>PACKED UNDER CCTV &bull; SEAL #JH-{product.id.slice(0, 4)}</span>
             </div>
           </div>
 
+          {/* Thumbnail Strip */}
           {product.images.length > 1 && (
             <div className="flex items-center gap-2 mt-3.5 overflow-x-auto pb-1">
               {product.images.map((img, idx) => (
@@ -131,8 +174,8 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
           {/* Verified Local Neighborhood Reviews snippet */}
           <div className="mt-4 pt-3.5 border-t border-[#eaeaec] space-y-2">
             <div className="flex items-center justify-between text-[11px] font-black text-[#7e818c]">
-              <span>VERIFIED LOCAL CUSTOMER FEEDBACK</span>
-              <span className="text-[#03a685] flex items-center gap-1">
+              <span>VERIFIED LOCAL SHOWROOM FEEDBACK</span>
+              <span className="text-[#03a685] flex items-center gap-1 font-bold">
                 <UserCheck className="w-3.5 h-3.5" /> Jamshedpur Verified
               </span>
             </div>
@@ -148,7 +191,7 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
           </div>
         </div>
 
-        {/* Right: Product Details, Size Chart, 2-Size Try-On, Specs */}
+        {/* Right: Product Details, Size Chart, 2-Size Try-On, Complete The Look, Specs */}
         <div className="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto space-y-5">
           <div className="space-y-4">
             <div>
@@ -158,33 +201,39 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
                 </span>
                 <span className="text-[11px] font-bold text-[#7e818c]">SKU: ZSTG-{product.id.slice(0, 6)}</span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-black text-[#1e2434] uppercase tracking-wide mt-1 font-display">
+
+              <h1 className="text-2xl font-black text-[#1e2434] tracking-tight mt-1 font-display">
                 {product.brand}
               </h1>
-              <p className="text-sm sm:text-base text-[#535766] mt-0.5 font-normal">
+              <p className="text-sm text-[#535766] mt-0.5">
                 {product.title}
               </p>
-              
-              <div className="inline-flex items-center gap-1.5 mt-2.5 px-3 py-1 border border-[#eaeaec] rounded-lg text-xs font-black text-[#1e2434] bg-slate-50">
-                <span>{product.rating}</span>
-                <Star className="w-3.5 h-3.5 fill-[#03a685] text-[#03a685]" />
-                <span className="text-[#7e818c] font-normal">| {product.reviewCount} Showroom Ratings</span>
-              </div>
             </div>
 
-            <hr className="border-[#eaeaec]" />
+            {/* Rating Tag */}
+            <div className="flex items-center gap-2">
+              <div className="bg-[#f5f5f7] px-2.5 py-1 rounded-md text-xs font-black flex items-center gap-1 text-[#1e2434]">
+                <span>{product.rating}</span>
+                <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                <span className="text-[#7e818c] font-normal">| {product.reviewCount} Ratings</span>
+              </div>
+              <span className="text-xs text-[#03a685] font-bold">
+                ✓ 100% Authentic Showroom Stock
+              </span>
+            </div>
 
-            <div className="space-y-1">
+            {/* Price Box */}
+            <div className="p-3.5 bg-[#fafbfc] border border-[#eaeaec] rounded-2xl space-y-1">
               <div className="flex items-baseline gap-3">
-                <span className="text-2xl sm:text-3xl font-black text-[#1e2434]">
+                <span className="text-2xl font-black text-[#1e2434]">
                   ₹{price.toLocaleString()}
                 </span>
                 {mrp > price && (
                   <>
-                    <span className="text-base text-[#7e818c] line-through font-medium">
+                    <span className="text-sm text-[#7e818c] line-through font-normal">
                       MRP ₹{mrp.toLocaleString()}
                     </span>
-                    <span className="text-base font-black text-[#ff905a]">
+                    <span className="text-sm font-black text-[#ff905a]">
                       ({discountPercent}% OFF)
                     </span>
                   </>
@@ -196,7 +245,7 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
               </p>
             </div>
 
-            {/* Size Selector + Size Chart Popover Button */}
+            {/* Size Selector + Smart Fit AI Button */}
             <div className="space-y-2.5 pt-1">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                 <span className="font-black uppercase tracking-wider text-[#1e2434]">
@@ -272,31 +321,24 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
             <div className="bg-gradient-to-r from-[#fff5eb] to-[#fef8f0] border-2 border-[#fcd8b8] rounded-2xl p-3.5 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-[#f26a10] text-white flex items-center justify-center font-black text-xs">
-                    🛵
+                  <div className="w-6 h-6 rounded-lg bg-[#f26a10] text-white flex items-center justify-center text-xs font-bold">
+                    <RotateCcw className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <div className="text-xs font-black text-[#1e2434] flex items-center gap-1">
-                      <span>Doorstep 2-Size Try-On</span>
-                      <span className="bg-[#f26a10] text-white text-[9px] font-black px-1.5 py-0.2 rounded uppercase">
-                        FREE
-                      </span>
-                    </div>
+                    <h4 className="text-xs font-extrabold text-[#1e2434]">
+                      Doorstep 2-Size Try-On Guarantee
+                    </h4>
                     <p className="text-[10px] text-[#7e818c]">
-                      Rider brings 2 sizes, waits 10 mins. Keep the best fit, return the other on spot!
+                      Courier brings a 2nd backup size in pouch for free 10-min fitting trial.
                     </p>
                   </div>
                 </div>
-
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={tryOnTwoSizes} 
-                    onChange={(e) => setTryOnTwoSizes(e.target.checked)} 
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#03a685]"></div>
-                </label>
+                <input
+                  type="checkbox"
+                  checked={tryOnTwoSizes}
+                  onChange={(e) => setTryOnTwoSizes(e.target.checked)}
+                  className="w-4 h-4 accent-[#ff3f6c] cursor-pointer"
+                />
               </div>
 
               {tryOnTwoSizes && (
@@ -319,6 +361,45 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* ✨ "Complete The Look" AI Cross-Sell Carousel (Track 2) */}
+            <div className="border border-indigo-200/70 bg-gradient-to-r from-indigo-50/60 via-purple-50/40 to-pink-50/60 rounded-2xl p-3.5 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-black text-indigo-950 uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-600 fill-indigo-600" />
+                  <span>Complete The Look (Save ₹450 Combo)</span>
+                </div>
+                <span className="text-[9px] bg-indigo-200/80 text-indigo-900 font-bold px-2 py-0.5 rounded-full">
+                  AI PAIRING
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-2 bg-white rounded-xl border border-indigo-100 flex items-center gap-2 shadow-2xs">
+                  <img
+                    src="https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=200&q=80"
+                    alt="Footwear"
+                    className="w-10 h-12 object-cover rounded-lg bg-slate-100 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-black text-[#1e2434] truncate">Sen Shoes Mojaris</div>
+                    <div className="text-[9px] text-[#7e818c]">₹1,299 &bull; Manglam</div>
+                  </div>
+                </div>
+
+                <div className="p-2 bg-white rounded-xl border border-indigo-100 flex items-center gap-2 shadow-2xs">
+                  <img
+                    src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&q=80"
+                    alt="Watch"
+                    className="w-10 h-12 object-cover rounded-lg bg-slate-100 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-black text-[#1e2434] truncate">Titan Gold Watch</div>
+                    <div className="text-[9px] text-[#7e818c]">₹2,495 &bull; Helios</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Specifications Table (Myntra Standard) */}
@@ -367,6 +448,7 @@ export const ZustagPDPModal: React.FC<ZustagPDPModalProps> = ({
             </div>
           </div>
 
+          {/* Action CTAs */}
           <div className="space-y-3 pt-3 border-t border-[#eaeaec]">
             <div className="flex items-center gap-3">
               <button
