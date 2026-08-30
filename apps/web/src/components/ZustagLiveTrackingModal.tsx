@@ -227,31 +227,53 @@ export const ZustagLiveTrackingModal: React.FC<LiveTrackingModalProps> = ({
           </div>
         </div>
 
-        {/* Rider Card (Zomato/Blinkit Style) */}
-        <div className="p-4 bg-[#fafbfc] border-b border-[#eaeaec] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#ff3f6c] to-[#ff905a] flex items-center justify-center text-white font-black text-sm shadow-sm">
-              SK
+        {/* Rider Card & Showroom Connect Action Strip (Track 4) */}
+        <div className="p-4 bg-[#fafbfc] border-b border-[#eaeaec] space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#ff3f6c] to-[#ff905a] flex items-center justify-center text-white font-black text-sm shadow-sm">
+                SK
+              </div>
+              <div>
+                <div className="font-extrabold text-sm text-[#282c3f] flex items-center gap-1.5">
+                  <span>Suraj Kumar</span>
+                  <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">
+                    4.9★ (380+ Deliveries)
+                  </span>
+                </div>
+                <div className="text-xs text-[#7e818c]">
+                  Zustag Express Courier &bull; Honda Activa JH-05-AB-4412
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="font-extrabold text-sm text-[#282c3f] flex items-center gap-1.5">
-                <span>Suraj Kumar</span>
-                <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">
-                  4.9★ (380+ Deliveries)
-                </span>
-              </div>
-              <div className="text-xs text-[#7e818c]">
-                Zustag Express Courier &bull; Honda Activa JH-05-AB-4412
-              </div>
+
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => alert('Connecting live phone call with rider Suraj Kumar (+91 98350 99412)...')}
+                className="px-3 py-1.5 rounded-xl bg-[#03a685] hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>Call</span>
+              </button>
+              <button 
+                onClick={() => alert('Opening WhatsApp live tracking chat with courier dispatch...')}
+                className="px-3 py-1.5 rounded-xl bg-[#25D366] hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+              >
+                <span>WhatsApp</span>
+              </button>
             </div>
           </div>
 
-          <button 
-            onClick={() => alert('Connecting live phone call with rider Suraj Kumar (+91 98350 99412)...')}
-            className="w-9 h-9 rounded-full bg-[#03a685] text-white flex items-center justify-center hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
-          >
-            <Phone className="w-4 h-4" />
-          </button>
+          {/* CCTV Security Packing Seal (Track 4) */}
+          <div className="bg-emerald-950/90 border border-emerald-500/40 text-emerald-300 p-2.5 rounded-xl flex items-center justify-between text-[11px] font-bold shadow-xs">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>PACKED UNDER CCTV &bull; TAMPER-PROOF SHOWROOM SEAL #8492</span>
+            </div>
+            <span className="text-[9px] bg-emerald-500/30 text-emerald-200 px-2 py-0.5 rounded-full font-black uppercase">
+              100% VERIFIED
+            </span>
+          </div>
         </div>
 
         {/* Step-by-Step Interactive Timeline */}
