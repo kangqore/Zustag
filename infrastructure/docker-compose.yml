@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # 1. Transactional Source of Truth Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: zustag-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: zustag_admin
+      POSTGRES_PASSWORD: zustag_secure_password
+      POSTGRES_DB: zustag_commerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zustag_admin -d zustag_commerce"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Ultra Fast Serving Layer & Context Cache (Redis)
+  redis:
+    image: redis:7-alpine
+    container_name: zustag-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "512mb", "--maxmemory-policy", "volatile-lru"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 3. Event Platform (Redpanda / Kafka compatible)
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.11
+    container_name: zustag-event-bus
+    restart: always
+    command:
+      - redpanda start
+      - --smp 1
+      - --memory 512M
+      - --reserve-memory 0M
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094
+      - --advertise-kafka-addr PLAINTEXT://redpanda:9092,OUTSIDE://localhost:9094
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+      - "9644:9644" # Admin API
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+
+  # 4. Search & Discovery Engine (OpenSearch)
+  opensearch:
+    image: opensearchproject/opensearch:2.12.0
+    container_name: zustag-opensearch
+    environment:
+      - cluster.name=zustag-cluster
+      - node.name=zustag-node-1
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_SECURITY_PLUGIN=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+
+volumes:
+  postgres_data:
+  redis_data:
+  redpanda_data:
+  opensearch_data:

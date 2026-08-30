@@ -1,0 +1,26 @@
+{
+  "name": "zustag-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ZUSTAG - Hyperlocal Fashion Commerce Network (Kangqore Group)",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspaces --if-present",
+    "test": "node packages/inventory-engine/test.js"
+  },
+  "keywords": [
+    "hyperlocal",
+    "fashion",
+    "commerce",
+    "zustag",
+    "kangqore",
+    "30-minute-delivery"
+  ],
+  "author": "Kangqore Group",
+  "license": "UNLICENSED"
+}

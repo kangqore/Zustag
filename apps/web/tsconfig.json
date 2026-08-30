@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@zustag/domain-core": ["../../packages/domain-core/src/index.ts"],
+      "@zustag/domain-core/*": ["../../packages/domain-core/src/*"],
+      "@zustag/inventory-engine": ["../../packages/inventory-engine/src/index.ts"],
+      "@zustag/inventory-engine/*": ["../../packages/inventory-engine/src/*"],
+      "@zustag/eta-engine": ["../../packages/eta-engine/src/index.ts"],
+      "@zustag/eta-engine/*": ["../../packages/eta-engine/src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
