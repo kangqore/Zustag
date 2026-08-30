@@ -26,6 +26,7 @@ export const ZustagProductCard: React.FC<ZustagProductCardProps> = ({
   const { product, variant, store, etaMinutes, price } = item;
   const [isHovered, setIsHovered] = useState(false);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
+  const [selectedColorHex, setSelectedColorHex] = useState(variant.colorHex || '#1e2434');
   const [quickAddedSize, setQuickAddedSize] = useState<string | null>(null);
 
   const images = product.images.length > 0 ? product.images : [FALLBACK_PRODUCT_IMAGE];
@@ -33,13 +34,18 @@ export const ZustagProductCard: React.FC<ZustagProductCardProps> = ({
   const discountPercent = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const isExpressEligible = etaMinutes <= 30;
 
+  // Extract unique color swatches from variants
+  const colorSwatches = Array.from(
+    new Map(product.variants.map((v) => [v.colorHex || v.color, { name: v.color, hex: v.colorHex || '#1e2434' }])).values()
+  );
+
   // Multi-image cycling on hover
   useEffect(() => {
     let interval: any;
     if (isHovered && images.length > 1) {
       interval = setInterval(() => {
         setActiveImageIdx((prev) => (prev + 1) % images.length);
-      }, 1500);
+      }, 1800);
     } else {
       setActiveImageIdx(0);
     }
@@ -61,6 +67,14 @@ export const ZustagProductCard: React.FC<ZustagProductCardProps> = ({
       onFindSimilar(item);
     } else {
       onOpenPDP(item);
+    }
+  };
+
+  const handleColorHover = (e: React.MouseEvent, hex: string, idx: number) => {
+    e.stopPropagation();
+    setSelectedColorHex(hex);
+    if (images[idx % images.length]) {
+      setActiveImageIdx(idx % images.length);
     }
   };
 
@@ -144,9 +158,11 @@ export const ZustagProductCard: React.FC<ZustagProductCardProps> = ({
           </button>
         )}
 
-        {/* Slide-up Quick Size Bar on Hover */}
-        <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-md py-2 px-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 border-t border-[#eaeaec] flex items-center justify-between text-xs font-bold text-[#1e2434] z-20 shadow-md">
-          <span className="text-[10px] text-[#7e818c] uppercase tracking-wider">Quick Size:</span>
+        {/* Slide-up 1-Tap Quick Size Selector Tray on Hover (Track 1) */}
+        <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-md py-2.5 px-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 border-t border-[#eaeaec] flex items-center justify-between text-xs font-bold text-[#1e2434] z-20 shadow-md">
+          <span className="text-[10px] text-[#7e818c] uppercase tracking-wider font-extrabold">
+            Quick Size:
+          </span>
           <div className="flex items-center gap-1.5">
             {product.variants.map((v) => {
               const isAdded = quickAddedSize === v.size;
@@ -154,6 +170,7 @@ export const ZustagProductCard: React.FC<ZustagProductCardProps> = ({
                 <button
                   key={v.id}
                   onClick={(e) => handleQuickAdd(e, v)}
+                  title={`Size ${v.size} • ${etaMinutes}m Delivery`}
                   className={`text-[11px] px-2 py-0.5 rounded-md border font-black transition-all cursor-pointer flex items-center gap-0.5 ${
                     isAdded
                       ? 'border-[#03a685] bg-[#03a685] text-white scale-105'
@@ -175,21 +192,43 @@ export const ZustagProductCard: React.FC<ZustagProductCardProps> = ({
         </div>
       </div>
 
-      {/* 2. Product Meta Info & Real-Time Stock Urgency */}
+      {/* 2. Product Meta Info & Real-Time Stock Urgency & Color Swatches */}
       <div className="p-3.5 space-y-1.5 bg-white">
         <div className="flex items-center justify-between">
-          <span className="font-black text-sm text-[#1e2434] truncate">
+          <span className="font-black text-sm text-[#1e2434] truncate font-display">
             {product.brand}
           </span>
+          {/* Showroom Scarcity Badge (Track 1) */}
           <span className="text-[9px] font-black text-[#f26a10] flex items-center gap-0.5 bg-amber-50 px-1.5 py-0.5 rounded-full border border-amber-200">
             <Flame className="w-2.5 h-2.5 fill-amber-500 text-amber-500 animate-pulse" />
-            <span>2 left in {store.locality.split(' ')[0]}</span>
+            <span>Only 2 left in Size {variant.size} at {store.locality.split(' ')[0]}</span>
           </span>
         </div>
 
         <div className="text-xs text-[#535766] truncate font-medium">
           {product.title}
         </div>
+
+        {/* Interactive Color Swatches (Track 1) */}
+        {colorSwatches.length > 1 && (
+          <div className="flex items-center gap-1.5 py-0.5">
+            {colorSwatches.map((swatch, idx) => (
+              <button
+                key={idx}
+                onClick={(e) => handleColorHover(e, swatch.hex, idx)}
+                onMouseEnter={(e) => handleColorHover(e, swatch.hex, idx)}
+                title={swatch.name}
+                className={`w-3.5 h-3.5 rounded-full transition-transform cursor-pointer border ${
+                  selectedColorHex === swatch.hex ? 'scale-125 ring-2 ring-[#ff3f6c] border-white' : 'border-black/20 hover:scale-110'
+                }`}
+                style={{ backgroundColor: swatch.hex }}
+              />
+            ))}
+            <span className="text-[9px] text-[#7e818c] font-bold ml-1">
+              {colorSwatches.length} colors
+            </span>
+          </div>
+        )}
 
         <div className="text-[10px] text-[#7e818c] font-medium truncate flex items-center gap-1">
           <span>From <strong>{store.name.split('-')[0]}</strong></span>
