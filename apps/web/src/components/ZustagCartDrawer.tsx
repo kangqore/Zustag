@@ -165,57 +165,96 @@ export const ZustagCartDrawer: React.FC<ZustagCartDrawerProps> = ({
             </div>
           ) : (
             <>
+              {/* 🚀 Gamified Express & Rewards Progress Bar (Track 3) */}
+              <div className="bg-gradient-to-r from-[#182344] to-[#2564ea] text-white p-3.5 rounded-2xl space-y-2 shadow-md">
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                    <span>
+                      {totalSellingPrice < 999
+                        ? `Add ₹${(999 - totalSellingPrice).toLocaleString()} more for Free 15-Min Express Dispatch 🚀`
+                        : totalSellingPrice < 1999
+                        ? `🎉 Free Express Unlocked! Add ₹${(1999 - totalSellingPrice).toLocaleString()} for 2X Greencard Points 🪙`
+                        : '👑 VIP Status Active! Free Express + 2X Cashback Unlocked!'}
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-cyan-300 font-black">
+                    {Math.min(100, Math.round((totalSellingPrice / 1999) * 100))}%
+                  </span>
+                </div>
+
+                <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-[#ff3f6c] via-amber-400 to-emerald-400 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.max(8, (totalSellingPrice / 1999) * 100))}%` }}
+                  />
+                </div>
+              </div>
+
               {/* Item Cards */}
               <div className="space-y-3">
                 {items.map((item) => (
                   <div
                     key={item.variant.id}
-                    className="p-3.5 rounded-2xl border border-[#eaeaec] bg-white shadow-2xs flex gap-3 relative"
+                    className="p-3.5 rounded-2xl border border-[#eaeaec] bg-white shadow-2xs flex flex-col gap-2 relative"
                   >
-                    <img
-                      src={item.product.images[0]}
-                      alt={item.product.title}
-                      className="w-20 h-24 object-cover rounded-xl bg-[#f5f5f7] shrink-0"
-                    />
+                    <div className="flex gap-3">
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product.title}
+                        className="w-20 h-24 object-cover rounded-xl bg-[#f5f5f7] shrink-0"
+                      />
 
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-start justify-between">
-                        <div className="font-black text-xs text-[#1e2434] truncate">
-                          {item.product.brand}
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-start justify-between">
+                          <div className="font-black text-xs text-[#1e2434] truncate">
+                            {item.product.brand}
+                          </div>
+                          <button
+                            onClick={() => onRemoveItem(item.variant.id)}
+                            className="text-[#7e818c] hover:text-rose-600 p-1 cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
-                        <button
-                          onClick={() => onRemoveItem(item.variant.id)}
-                          className="text-[#7e818c] hover:text-rose-600 p-1 cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
 
-                      <div className="text-xs text-[#535766] truncate font-normal">
-                        {item.product.title}
-                      </div>
+                        <div className="text-xs text-[#535766] truncate font-normal">
+                          {item.product.title}
+                        </div>
 
-                      <div className="flex items-center gap-2 text-[11px] text-[#7e818c]">
-                        <span>Size: <strong className="text-[#1e2434]">{item.variant.size}</strong></span>
-                        <span>&bull;</span>
-                        <span>Qty: <strong className="text-[#1e2434]">{item.quantity}</strong></span>
-                      </div>
+                        <div className="flex items-center gap-2 text-[11px] text-[#7e818c]">
+                          <span>Primary Size: <strong className="text-[#1e2434]">{item.variant.size}</strong></span>
+                          <span>&bull;</span>
+                          <span>Qty: <strong className="text-[#1e2434]">{item.quantity}</strong></span>
+                        </div>
 
-                      <div className="text-[10px] text-[#2564ea] font-semibold flex items-center gap-1">
-                        <Zap className="w-2.5 h-2.5 fill-current" />
-                        <span>{item.store.name.split('-')[0]} ({item.store.locality})</span>
-                      </div>
+                        <div className="text-[10px] text-[#2564ea] font-semibold flex items-center gap-1">
+                          <Zap className="w-2.5 h-2.5 fill-current" />
+                          <span>{item.store.name.split('-')[0]} ({item.store.locality})</span>
+                        </div>
 
-                      <div className="flex items-center gap-2 pt-1">
-                        <span className="font-black text-xs text-[#1e2434]">
-                          ₹{(item.price * item.quantity).toLocaleString()}
-                        </span>
-                        {item.variant.mrp > item.price && (
-                          <span className="text-[10px] text-[#7e818c] line-through">
-                            ₹{(item.variant.mrp * item.quantity).toLocaleString()}
+                        <div className="flex items-center gap-2 pt-0.5">
+                          <span className="font-black text-xs text-[#1e2434]">
+                            ₹{(item.price * item.quantity).toLocaleString()}
                           </span>
-                        )}
+                          {item.variant.mrp > item.price && (
+                            <span className="text-[10px] text-[#7e818c] line-through">
+                              ₹{(item.variant.mrp * item.quantity).toLocaleString()}
+                            </span>
+                          )}
+                        </div>
                       </div>
+                    </div>
+
+                    {/* Doorstep Try-On Visual Badge (Track 3) */}
+                    <div className="p-2 rounded-xl bg-amber-50 border border-amber-200 text-[10px] text-amber-900 font-bold flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <RotateCcw className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span>Try-On in Pouch: <strong>Size {item.variant.size}</strong> + <strong>Size {item.tryOnSecondarySize || (item.variant.size === 'M' ? 'L' : 'M')}</strong></span>
+                      </div>
+                      <span className="text-[9px] bg-amber-200/80 text-amber-900 font-black px-1.5 py-0.2 rounded-full uppercase">
+                        2 SIZES
+                      </span>
                     </div>
                   </div>
                 ))}
