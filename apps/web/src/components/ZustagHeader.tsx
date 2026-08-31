@@ -268,22 +268,8 @@ export const ZustagHeader: React.FC<ZustagHeaderProps> = ({
           ))}
         </nav>
 
-        {/* Right: Deliver To + Profile + Wishlist + Bag */}
+        {/* Right: Profile + Wishlist + Bag */}
         <div className="flex items-center gap-6 sm:gap-8 shrink-0">
-          {/* Deliver To Location Pin */}
-          <div 
-            onClick={() => setShowLocationModal(true)}
-            className="flex items-center gap-1.5 bg-[#f5f5f7] hover:bg-[#eaeaec] px-3.5 py-1.5 rounded-xl cursor-pointer border border-[#eaeaec] transition-colors"
-          >
-            <MapPin className="w-4 h-4 text-[#ff3f6c] shrink-0" />
-            <div className="text-left">
-              <div className="text-[9px] font-bold text-[#7e818c] uppercase leading-none">Deliver To</div>
-              <div className="text-xs font-extrabold text-[#1e2434] truncate max-w-[90px] sm:max-w-[120px] leading-tight mt-0.5">
-                {currentZone.areaName.split(' ')[0]}
-              </div>
-            </div>
-            <ChevronDown className="w-3 h-3 text-[#7e818c]" />
-          </div>
 
           {/* Profile with Rich Myntra/Pantaloons-Style Greencard VIP Dropdown */}
           <div 
