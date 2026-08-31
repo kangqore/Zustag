@@ -152,77 +152,14 @@ export const ZustagUniversalSearch: React.FC<UniversalSearchProps> = ({
   };
 
   return (
-    <section id="universal-search-container" className="w-full max-w-[1500px] mx-auto px-4 sm:px-8 my-5">
+    <section id="universal-search-container" className="w-full max-w-[1500px] mx-auto px-4 sm:px-8 my-3">
       <div 
         ref={searchContainerRef}
-        className="relative bg-gradient-to-r from-[#ffffff] via-[#fdfcfb] to-[#ffffff] border-2 border-[#eaeaec] focus-within:border-[#282c3f] rounded-2xl p-4 sm:p-6 shadow-lg transition-all duration-300"
+        className="relative bg-white border-2 border-[#eaeaec] focus-within:border-[#282c3f] rounded-2xl p-2 sm:p-3 shadow-md transition-all duration-300"
       >
-        {/* Header Ribbon with AI Stylist Direct CTA */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#f5f5f6]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#ff3f6c] to-[#f26a10] flex items-center justify-center text-white shadow-xs">
-              <Sparkles className="w-4 h-4 animate-spin" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-xs sm:text-sm font-black uppercase text-[#282c3f] tracking-wider font-display">
-                  Universal Hyperlocal Search & AI Stylist
-                </h3>
-                <span className="text-[9px] bg-gradient-to-r from-[#ff3f6c] to-[#f26a10] text-white font-black px-2 py-0.5 rounded-full uppercase">
-                  GEMINI POWERED
-                </span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-[#7e818c]">
-                Search 100+ showrooms or let Gemini AI curate complete 30-min outfits
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {/* Direct AI Stylist Launch Button */}
-            {onTriggerAIStylist && (
-              <button
-                onClick={() => onTriggerAIStylist(searchQuery || 'Style me for an upscale party tonight')}
-                className="px-3.5 py-1.5 bg-gradient-to-r from-[#182344] to-[#2564ea] hover:opacity-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer transition-all border border-blue-400/30"
-              >
-                <Bot className="w-3.5 h-3.5 text-cyan-300" />
-                <span>✨ Ask AI Stylist</span>
-              </button>
-            )}
-
-            {/* Filter Scope Tabs */}
-            <div className="flex items-center gap-1 bg-[#f5f5f6] p-1 rounded-xl text-xs font-bold">
-              <button
-                onClick={() => setActiveFilterTab('all')}
-                className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                  activeFilterTab === 'all' ? 'bg-white text-[#282c3f] shadow-xs' : 'text-[#7e818c] hover:text-[#282c3f]'
-                }`}
-              >
-                All Matches
-              </button>
-              <button
-                onClick={() => setActiveFilterTab('stores')}
-                className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                  activeFilterTab === 'stores' ? 'bg-white text-[#282c3f] shadow-xs' : 'text-[#7e818c] hover:text-[#282c3f]'
-                }`}
-              >
-                Showrooms ({matchingStores.length})
-              </button>
-              <button
-                onClick={() => setActiveFilterTab('products')}
-                className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                  activeFilterTab === 'products' ? 'bg-white text-[#282c3f] shadow-xs' : 'text-[#7e818c] hover:text-[#282c3f]'
-                }`}
-              >
-                Apparel ({matchingItems.length})
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Big Smart Search Input Bar */}
-        <div className="relative mt-4">
-          <div className="relative flex items-center bg-[#f5f5f6] hover:bg-[#f0f0f2] focus-within:bg-white rounded-xl px-4 py-3.5 border-2 border-transparent focus-within:border-[#ff3f6c] transition-all shadow-inner">
+        <div className="relative">
+          <div className="relative flex items-center bg-[#f5f5f6] hover:bg-[#f0f0f2] focus-within:bg-white rounded-xl px-4 py-3 border-2 border-transparent focus-within:border-[#ff3f6c] transition-all shadow-inner">
             <Search className="w-5 h-5 text-[#7e818c] shrink-0 mr-3" />
             <input
               ref={inputRef}
